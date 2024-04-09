@@ -31,6 +31,7 @@ namespace vault {
             for (uint16_t i = 0; i < 256; i++) {
                 vault_file.write(ZERO_BUF, 4);
             }
+            vault_file.flush();
         }
         mode = Mode::unlocked;
         master_pin = master;
@@ -45,26 +46,19 @@ namespace vault {
     }
 
     uint32_t load_pin(uint8_t id) {
-        uint32_t len = vault_file.size();
-        uint32_t pin_offset = (uint32_t)id * 4;
-        if (!vault_file.seek(pin_offset)) {
-            vault_file.close();
-            return -1;
-        }
-        uint32_t pin = 0;
-        if (vault_file.read((void *)(&pin), 4) != 4) {
-            vault_file.close();
-            return -1;
-        }
+        // todo - handle errors
+        // todo - implement encryption and shuffeling
+        vault_file.seek(id * 4);
+        uint32_t pin;
+        vault_file.read((void *)(&pin), 4);
         return pin;
-        // todo - implement
     }
 
     void store_pin(uint8_t id, uint32_t pin) {
-        // todo - implement
-    }
-
-    void clear_pin(uint8_t id) {
-        // todo - implement
+        // todo - handle errors
+        // todo - implement encryption and shuffeling
+        vault_file.seek(id * 4);
+        vault_file.write((char *)(&pin), 4);
+        vault_file.flush();
     }
 }

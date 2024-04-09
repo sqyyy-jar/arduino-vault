@@ -14,8 +14,7 @@ namespace display {
     const uint8_t SCREEN_ADDRESS = 0x3c;
     const char *const TITLE_LOCKED PROGMEM = "Locked";
     const char *const TITLE_UNLOCKED PROGMEM = "Unlocked";
-    const char *const TITLE_SET_PIN PROGMEM = "Set pin";
-    const char *const TITLE_LOAD_PIN PROGMEM = "Show pin";
+    const char *const TITLE_EDIT PROGMEM = "Edit pin";
 
     static Adafruit_SSD1306 controller(WIDTH, HEIGHT);
     static char *title = TITLE_LOCKED;
@@ -38,11 +37,8 @@ namespace display {
             case vault::Mode::unlocked:
                 title = TITLE_UNLOCKED;
                 break;
-            case vault::Mode::set_pin:
-                title = TITLE_SET_PIN;
-                break;
-            case vault::Mode::load_pin:
-                title = TITLE_LOAD_PIN;
+            case vault::Mode::edit:
+                title = TITLE_EDIT;
                 break;
         }
     }
@@ -52,7 +48,7 @@ namespace display {
         input_digits = new_input_digits;
     }
 
-    void update(void) { // todo - check correctness of implementation
+    void update(void) {
         controller.clearDisplay();
         controller.setTextSize(1);
         controller.setTextColor(SSD1306_WHITE);

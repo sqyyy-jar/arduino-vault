@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 namespace keypad {
-    // todo: set pins
+    // todo - set pins
     const uint8_t ROW_PINS[4] = {0, 0, 0, 0};
     const uint8_t COL_PINS[4] = {0, 0, 0, 0};
 
@@ -59,7 +59,6 @@ namespace keypad {
     }
 
     void read(Event *out) {
-        // todo: test code
         out->down = 0;
         for (uint8_t col = 0; col < 4; col++) {
             for (uint8_t row = 0; row < 4; row++) {

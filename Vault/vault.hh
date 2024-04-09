@@ -7,8 +7,7 @@ namespace vault {
     enum class Mode {
         locked,
         unlocked,
-        set_pin,
-        load_pin,
+        edit,
     };
 
     void setup(void);
@@ -22,8 +21,6 @@ namespace vault {
     uint32_t load_pin(uint8_t id);
 
     void store_pin(uint8_t id, uint32_t pin);
-
-    void clear_pin(uint8_t id);
 }
 
 #endif
