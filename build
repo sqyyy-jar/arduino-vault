@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+arduino-cli compile -b arduino:avr:mega Vault
