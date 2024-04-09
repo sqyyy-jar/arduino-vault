@@ -4,13 +4,20 @@
 #include <stdint.h>
 
 namespace vault {
-    const uint8_t CHIP_SELECT = 10;
+    enum class Mode {
+        locked,
+        unlocked,
+        set_pin,
+        load_pin,
+    };
 
     void setup(void);
 
-    bool is_locked();
-
     void unlock(uint32_t master);
+
+    Mode get_mode();
+
+    void set_mode(Mode new_mode);
 
     uint32_t load_pin(uint8_t id);
 

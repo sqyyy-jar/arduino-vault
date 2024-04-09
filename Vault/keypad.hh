@@ -4,11 +4,7 @@
 #include <stdint.h>
 
 namespace keypad {
-    // todo: set pins
-    const uint8_t ROW_PINS[4] = {0, 0, 0, 0};
-    const uint8_t COL_PINS[4] = {0, 0, 0, 0};
-
-    enum Button {
+    enum Key {
         c1,
         c2,
         c3,
@@ -35,14 +31,14 @@ namespace keypad {
     struct Event {
         uint16_t down;
     
-        bool is_down(Button i);
+        bool is_down(Key i);
 
-        Button first_down();
+        Key first_down();
     };
 
     void setup(void);
 
-    char button_char(Button button);
+    char key_char(Key key);
 
     void read(Event *out);
 }

@@ -3,22 +3,24 @@
 #include <Arduino.h>
 
 namespace keypad {
-    bool Event::is_down(Button button) {
-        // todo: test code
-        return (this->down >> button) & 1 == 1;
+    // todo: set pins
+    const uint8_t ROW_PINS[4] = {0, 0, 0, 0};
+    const uint8_t COL_PINS[4] = {0, 0, 0, 0};
+
+    bool Event::is_down(Key key) {
+        return (this->down >> key) & 1 == 1;
     }
 
-    Button Event::first_down() {
+    Key Event::first_down() {
         for (uint8_t i = 0; i < 16; i++) {
             if ((this->down >> i) & 1) {
                 return i;
             }
         }
-        return none;
+        return Key::none;
     }
 
     void setup(void) {
-        // todo: test code
         // Setup rows
         for (uint8_t i = 0; i < 4; i++)  {
             uint8_t row = ROW_PINS[i];
@@ -32,8 +34,8 @@ namespace keypad {
         }
     }
 
-    char button_char(Button button) {
-        switch (button) {
+    char key_char(Key key) {
+        switch (key) {
             case c1: return '1';
             case c2: return '2';
             case c3: return '3';
@@ -58,7 +60,7 @@ namespace keypad {
 
     void read(Event *out) {
         // todo: test code
-        out->down = 0x0000;
+        out->down = 0;
         for (uint8_t col = 0; col < 4; col++) {
             for (uint8_t row = 0; row < 4; row++) {
                 digitalWrite(col, LOW);

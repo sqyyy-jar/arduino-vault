@@ -36,21 +36,16 @@
 #include "keypad.hh"
 #include "vault.hh"
 
-enum Mode {
-    locked,
-    unlocked,
-    set_pin,
-    load_pin,
-};
+using vault::Mode;
 
-static Mode mode = locked;
 static uint32_t input = 0; // Input/output number
 static uint32_t input_multiplier = 1; // Multiplier for input (= 10^input_digits)
 static uint8_t input_digits = 0; // Amount of digits in input number
-static keypad::Button last_button = keypad::none; // Last pressed button
+static uint8_t pin_id = 0;
+static keypad::Key last_key = keypad::Key::none; // Last pressed key
 
-void handle_locked(keypad::Button button) {
-    char c = keypad::button_char(button);
+void handle_locked(keypad::Key key) {
+    char c = keypad::key_char(key);
     if (input_digits < 9 && c >= '0' && c <= '9') { // Maximum of 9 digits for pins
         input += input_multiplier * (c - '0');
         input_multiplier *= 10;
@@ -60,37 +55,83 @@ void handle_locked(keypad::Button button) {
     if (input_digits == 0) { // No input yet
         return;
     }
-    switch (button) {
-        case keypad::ch:
+    switch (key) {
+        case keypad::Key::ch: // # -> unlock vault
             vault::unlock(input);
             break;
-        case keypad::cc:
-            // todo - implement
-            break;
-        case keypad::cd:
+        case keypad::Key::cc: // c -> clear input
             input = 0;
             input_multiplier = 1;
             input_digits = 0;
+            break;
+        case keypad::Key::cd: // d -> delete input digit
+            input_multiplier /= 10;
+            input -= input / input_multiplier * input_multiplier;
+            input_digits -= 1;
             break;
     }
 }
 
-void handle_unlocked(keypad::Button button) {}
-
-void handle_set_pin(keypad::Button button) {}
-
-void handle_load_pin(keypad::Button button) {
-    switch (button) {
-        case keypad::cx:
-            mode = unlocked;
+void handle_unlocked(keypad::Key key) {
+    char c = keypad::key_char(key);
+    if (input_digits < 3 && c >= '0' && c <= '9') { // Maximum of 3 digits for ids
+        uint32_t new_input = input + input_multiplier + (c - '0');
+        if (new_input > 255) { // Maximum id
+            return;
+        }
+        input = new_input;
+        input_multiplier *= 10;
+        input_digits += 1;
+        return;
+    }
+    switch (key) {
+        case keypad::Key::cx: // * -> lock
+            vault::set_mode(Mode::locked);
             input = 0;
             input_multiplier = 1;
             input_digits = 0;
             break;
-        case keypad::cc:
-        case keypad::cd:
-            vault::clear_pin(0); // todo - provide pin id
-            mode = unlocked;
+        case keypad::Key::ca: // a -> set pin
+            vault::set_mode(Mode::set_pin);
+            pin_id = input;
+            // vault::set_pin(); // todo - implement
+            break;
+        case keypad::Key::cb: // b -> load pin
+            vault::set_mode(Mode::load_pin);
+            pin_id = input;
+            input = vault::load_pin(pin_id); // todo - implement
+            input_multiplier = 1;
+            input_digits = 9;
+            break;
+        case keypad::Key::cc: // c -> clear input
+            input = 0;
+            input_multiplier = 1;
+            input_digits = 0;
+            break;
+        case keypad::Key::cd: // d -> delete input digit
+            input_multiplier /= 10;
+            input -= input / input_multiplier * input_multiplier;
+            input_digits -= 1;
+            break;
+    }
+}
+
+void handle_set_pin(keypad::Key key) {
+    // todo - implement
+}
+
+void handle_load_pin(keypad::Key key) {
+    switch (key) {
+        case keypad::Key::cx: // * -> unlock
+            vault::set_mode(Mode::unlocked);
+            input = 0;
+            input_multiplier = 1;
+            input_digits = 0;
+            break;
+        case keypad::Key::cc:
+        case keypad::Key::cd: // c | d -> clear, unlock
+            vault::clear_pin(input);
+            vault::set_mode(Mode::unlocked);
             input = 0;
             input_multiplier = 1;
             input_digits = 0;
@@ -108,28 +149,30 @@ void setup(void) {
 void loop(void) {
     keypad::Event event;
     keypad::read(&event);
-    keypad::Button button = event.first_down();
+    keypad::Key key = event.first_down();
     // Anti repeat
-    if (last_button == button) {
+    if (last_key == key) {
         return;
     }
-    last_button = button;
-    if (button == keypad::none) {
+    last_key = key;
+    if (key == keypad::Key::none) {
         return;
     }
-    switch (mode) {
-        case locked:
-            handle_locked(button);
+    switch (vault::get_mode()) {
+        case Mode::locked:
+            handle_locked(key);
             break;
-        case unlocked:
-            handle_unlocked(button);
+        case Mode::unlocked:
+            handle_unlocked(key);
             break;
-        case set_pin:
-            handle_set_pin(button);
+        case Mode::set_pin:
+            handle_set_pin(key);
             break;
-        case load_pin:
-            handle_load_pin(button);
+        case Mode::load_pin:
+            handle_load_pin(key);
             break;
     }
+    display::set_mode(vault::get_mode());
+    display::set_input(input, input_digits);
     display::update();
 }
