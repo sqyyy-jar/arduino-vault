@@ -7,7 +7,7 @@
     for (;;);
 
 namespace vault {
-    const uint8_t CHIP_SELECT = 10;
+    const uint8_t CHIP_SELECT = 4;
     const char *const FILE_NAME PROGMEM = "vault.bin";
     const uint8_t ZERO_BUF[4] PROGMEM = {0};
 
@@ -16,6 +16,7 @@ namespace vault {
     static File vault_file;
 
     void setup(void) {
+        pinMode(CHIP_SELECT, OUTPUT);
         if (!SD.begin(CHIP_SELECT)) {
             PANIC("SD setup failed");
         }
@@ -29,7 +30,10 @@ namespace vault {
         }
         if (!exists) {
             for (uint16_t i = 0; i < 256; i++) {
-                vault_file.write(ZERO_BUF, 4);
+                vault_file.write((uint8_t)0);
+                vault_file.write((uint8_t)0);
+                vault_file.write((uint8_t)0);
+                vault_file.write((uint8_t)0);
             }
             vault_file.flush();
         }
@@ -48,17 +52,30 @@ namespace vault {
     uint32_t load_pin(uint8_t id) {
         // todo - handle errors
         // todo - implement encryption and shuffeling
-        vault_file.seek(id * 4);
-        uint32_t pin;
-        vault_file.read((void *)(&pin), 4);
+        if (!vault_file.seek(id * 4)) {
+            Serial.println("seek");
+        }
+        uint32_t pin = 999999999;
+        size_t res = vault_file.read((void *)(&pin), 4);
+        if (res != 4) {
+            Serial.print("ldp ");
+            Serial.println(res);
+        }
         return pin;
     }
 
     void store_pin(uint8_t id, uint32_t pin) {
         // todo - handle errors
         // todo - implement encryption and shuffeling
-        vault_file.seek(id * 4);
-        vault_file.write((char *)(&pin), 4);
+        if (!vault_file.seek(id * 4)) {
+            Serial.println("seek");
+        }
+        Serial.println(vault_file.availableForWrite());
+        size_t res = vault_file.write((char *)(&pin), 4);
+        if (res != 4) {
+            Serial.print("stp ");
+            Serial.println(res);
+        }
         vault_file.flush();
     }
 }

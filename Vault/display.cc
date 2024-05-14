@@ -9,6 +9,7 @@
     for (;;);
 
 namespace display {
+    const uint32_t POWERS_OF_TEN[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
     const uint8_t WIDTH = 128;
     const uint8_t HEIGHT = 64;
     const uint8_t SCREEN_ADDRESS = 0x3c;
@@ -50,16 +51,12 @@ namespace display {
 
     void update(void) {
         controller.clearDisplay();
-        controller.setTextSize(1);
+        controller.setTextSize(2);
         controller.setTextColor(SSD1306_WHITE);
         controller.setCursor(0, 0);
         controller.println(title);
-        uint32_t tmp_input = input;
-        char c[2] = {0};
-        for (uint8_t digit = 0; digit < input_digits; digit++) {
-            c[0] = tmp_input % 10 + '0';
-            controller.print(c);
-            tmp_input /= 10;
+        for (uint8_t digit = input_digits; digit > 0; digit--) {
+            controller.print((char)(input / POWERS_OF_TEN[digit - 1] % 10 + '0'));
         }
         controller.display();
     }
