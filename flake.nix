@@ -22,6 +22,7 @@
               clang
               pkg-config
               libudev-zero
+              gnumake
             ];
           };
         }
