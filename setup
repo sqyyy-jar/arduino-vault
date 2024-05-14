@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-arduino-cli core install arduino:avr
-arduino-cli lib install "SD"
-arduino-cli lib install "Adafruit SSD1306"
