@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 namespace keypad {
-    char get_key();
+    char get_key(void);
 }
 
 #endif

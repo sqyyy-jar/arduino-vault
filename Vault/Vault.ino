@@ -73,7 +73,7 @@ void handle_unlocked(char key) {
             return;
         }
         uint32_t new_input = input * 10 + (key - '0');
-        if (new_input > 255) { // Maximum id
+        if (new_input > 99) { // Maximum id
             return;
         }
         input = new_input;
@@ -82,7 +82,7 @@ void handle_unlocked(char key) {
     }
     switch (key) {
         case '*': // * -> lock
-            vault::set_mode(Mode::locked);
+            vault::lock();
             input = 0;
             input_digits = 0;
             break;

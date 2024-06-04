@@ -14,7 +14,7 @@ namespace keypad {
     const uint8_t COL_PINS[4] = {26, 27, 28, 29};
     static Keypad keypad(makeKeymap(KEYS), ROW_PINS, COL_PINS, 4, 4);
 
-    char get_key() {
+    char get_key(void) {
         return keypad.getKey();
     }
 }
