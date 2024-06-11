@@ -105,13 +105,11 @@ namespace vault {
     }
 
     void encapsulate_pin(uint32_t *pin) {
-        *pin += 73741825;
         *pin |= 0b11 << 30; // todo: replace with random bits
     }
     
     void decapsulate_pin(uint32_t *pin) {
         *pin &= ~(0b11 << 30);
-        *pin -= 73741825;
     }
 
     void xor_pin(uint8_t id, uint32_t *pin) {
