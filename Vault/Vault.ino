@@ -1,32 +1,3 @@
-//     Keyboard layout
-//
-// 1 2 3 A
-// 4 5 6 B
-// 7 8 9 C
-// * 0 # D
-//
-//     Modes
-// 
-// Locked:
-// - [0-9]: enter master pin
-// - [#]:   unlock vault
-// - [C]:   clear pin
-// - [D]:   delete digit
-//
-// Unlocked:
-// - [0-9]: enter pin id
-// - [*]:   lock vault
-// - [A-B]:   go to edit pin mode
-// - [C]:   clear pin id
-// - [D]:   delete pin id digit
-// 
-// Edit pin:
-// - [0-9]: enter pin
-// - [*]:   go to unlocked mode
-// - [#]:   submit pin
-// - [C]:   clear pin
-// - [D]:   delete digit
-
 #include "display.hh"
 #include "keypad.hh"
 #include "vault.hh"
