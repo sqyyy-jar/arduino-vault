@@ -105,7 +105,7 @@ namespace vault {
     }
 
     void encapsulate_pin(uint32_t *pin) {
-        *pin |= random(0, 4) << 30;
+        *pin |= 0b11 << 30;
     }
     
     void decapsulate_pin(uint32_t *pin) {
